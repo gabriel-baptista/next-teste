@@ -1,118 +1,160 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { Inter } from "next/font/google";
+import { useState, useEffect } from "react";
+import { Box, Button } from "@mui/material";
+import { DataGrid, GridToolbar, ptBR } from "@mui/x-data-grid";
+import Header from "./Header";
+import jsonData from "../data/announcements.json";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [data, setData] = useState(null);
+
+  //  pegando os dados do arquivo json
+  useEffect(() => {
+    try {
+      setData(jsonData);
+      console.log(jsonData);
+    } catch (error) {
+      console.error("Erro ao obter dados do JSON:", error);
+    }
+  }, []);
+
+  const [expandedRowId, setExpandedRowId] = useState(null);
+
+  // funcao para expandir a linha
+  const handleExpandClick = (id) => {
+    setExpandedRowId(expandedRowId === id ? null : id);
+  };
+
+  // objeto com as colunas da tabela
+  const columns = [
+    { field: "ads_id", headerName: "ID", flex: 1, minWidth: 150 },
+    { field: "name", headerName: "NOME", flex: 1, minWidth: 400 },
+    { field: "sku", headerName: "SKU", flex: 1, minWidth: 100 },
+    { field: "modality", headerName: "MODALIDADE", flex: 1, minWidth: 200 },
+    { field: "value", headerName: "VALOR", flex: 1, minWidth: 100 },
+    { field: "quantity", headerName: "QUANTIDADE", flex: 1, minWidth: 150 },
+    { field: "total_value", headerName: "VALOR TOTAL", flex: 1, minWidth: 150 },
+    { field: "sale_fee", headerName: "TAXA DE VENDA", flex: 1, minWidth: 150 },
+    {
+      field: "shipping_price",
+      headerName: "PREÇO DO FRETE",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "shipping_payed",
+      headerName: "FRETE PAGO",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "shipping_discount",
+      headerName: "DESCONTO DO FRETE",
+      flex: 1,
+      minWidth: 150,
+    },
+    { field: "cost", headerName: "CUSTO", flex: 1, minWidth: 150 },
+    { field: "total_cost", headerName: "CUSTO TOTAL", flex: 1, minWidth: 150 },
+    { field: "tax", headerName: "IMPOSTO", flex: 1, minWidth: 150 },
+    { field: "income", headerName: "RENDA", flex: 1, minWidth: 150 },
+    {
+      field: "profit_value",
+      headerName: "VALOR DO LUCRO",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "profit_sale",
+      headerName: "LUCRO DE VENDA",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "profit_item",
+      headerName: "ITEM DE LUCRO",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "is_registered",
+      headerName: "REGISTRADO?",
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: "orderDetail",
+      headerName: "Detalhes do Pedido",
+      sortable: false,
+      width: 200,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleExpandClick(params.id)}
+        >
+          Expandir
+        </Button>
+      ),
+    },
+  ];
+
+  
+  const rowsWithDetails = data
+    ? data.reduce((newRows, row) => {
+        newRows.push(row);
+
+        if (row.ads_id === expandedRowId) {
+          row.orders_detail.forEach((orderDetail) => {
+            console.log(orderDetail.order_id + "teste");
+            newRows.push({
+              ads_id: `ORDER_ID: ${orderDetail.order_id}`,
+              name: `${orderDetail.name}`,
+              sku: `${orderDetail.sku}`,
+              modality: `LOGISTICA: ${orderDetail.logistic_type}`,
+              value: `${orderDetail.value}`,
+              quantity: `${orderDetail.quantity}`,
+              total_value: `${orderDetail.total_value}`,
+              sale_fee: `${orderDetail.sale_fee}`,
+              shipping_price: `${orderDetail.shipping_price}`,
+              shipping_payed: `${orderDetail.shipping_payed}`,
+              shipping_discount: `${orderDetail.shipping_discount}`,
+              cost: `${orderDetail.cost}`,
+              total_cost: `${orderDetail.total_cost}`,
+              tax: `${orderDetail.tax}`,
+              income: `${orderDetail.income}`,
+              profit_value: `${orderDetail.profit_value}`,
+              profit_sale: `${orderDetail.profit_sale}`,
+              profit_item: `${orderDetail.profit_item}`,
+              is_registered: `CANCELADO? ${orderDetail.is_cancel}`,
+            });
+          });
+        }
+
+        return newRows;
+      }, [])
+    : [];
+
   return (
     <main
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
     >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <Header />
+      <div style={{ height: "85vh", width: "100%" }}>
+        <DataGrid
+          getRowId={(row) => row.ads_id}
+          rows={rowsWithDetails}
+          columns={columns}
+          slots={{
+            toolbar: GridToolbar,
+          }}
+          pageSizeOptions={[5, 10, 100]}
+          rowsPerPageOptions={[5]}
+          localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
         />
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
     </main>
-  )
+  );
 }
