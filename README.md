@@ -7,7 +7,7 @@ Primeiro rode o comando abaixo para instalar as dependencias:
 npm install
 ```
 
-Execute o comando abaixo para iniciar o projeto:]
+Execute o comando abaixo para iniciar o projeto:
 ```bash
 npm run dev
 ```
