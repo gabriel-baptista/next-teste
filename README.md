@@ -1,5 +1,5 @@
 ## Teste Front-End Next
-Teste de Front-End proposto pela empresa Next .
+Teste de Front-End proposto pela empresa Next.
 
 ## Executar o teste
 Primeiro rode o comando abaixo para instalar as dependencias: 
